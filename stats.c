@@ -12,10 +12,16 @@
 #include <mpi.h>
 
 int getNodeId(){
+    int numProcesses, myRank;
+
+    MPI_Comm_size(MPI_COMM_WORLD, &numProcesses);
+    MPI_Comm_rank(MPI_COMM_WORLD, &myRank);
+
+
     char name[MPI_MAX_PROCESSOR_NAME];
     int len;
     MPI_Get_processor_name(name, &len);
-    printf("Hello, world.  I am %d of %d on %s\n", rank, nprocs, name);fflush(stdout);
+    printf("Hello, world.  I am %d of %d on %s\n", myRank, numProcesses, name);fflush(stdout);
     return ((int) name[len-1]) % 2;
 }
 
