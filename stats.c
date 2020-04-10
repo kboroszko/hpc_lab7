@@ -41,16 +41,20 @@ int main(int argc, char * argv[])
         partnerNode = 0;
         partnerRank = myRank - (numProcesses/2);
     }
-    void * buff = malloc(payload);
+
+
+    void * buff = malloc(100);
     switch (node){
         case 0:
             MPI_Recv(buff, 100, MPI_BYTE, partnerRank, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
-            MPI_Send(buff, 100, MPI_BYTE, to, 0, MPI_COMM_WORLD);
+            MPI_Send(buff, 100, MPI_BYTE, partnerRank, 0, MPI_COMM_WORLD);
             break;
         case 1:
             double t = measureLatency(buff, partnerRank, 100);
             printf("%2d %10d %f", myRank, 100, t);
     }
+
+    free(buff);
 
     MPI_Finalize(); /* mark that we've finished communicating */
 
