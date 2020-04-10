@@ -15,6 +15,7 @@ int getNodeId(){
     char name[MPI_MAX_PROCESSOR_NAME];
     int len;
     MPI_Get_processor_name(name, &len);
+    printf("Hello, world.  I am %d of %d on %s\n", rank, nprocs, name);fflush(stdout);
     return ((int) name[len-1]) % 2;
 }
 
@@ -41,6 +42,14 @@ int main(int argc, char * argv[])
     MPI_Comm_size(MPI_COMM_WORLD, &numProcesses);
     MPI_Comm_rank(MPI_COMM_WORLD, &myRank);
     int node = getNodeId();
+    int partnerNode, partnerRank;
+    if(node == 0){
+        partnerNode = 1;
+        partnerRank = myRank + (numProcesses/2);
+    } else {
+        partnerNode = 0;
+        partnerRank = myRank - (numProcesses/2);
+    }
     printf("%2d - %d\n", myRank, node);
 
     MPI_Finalize(); /* mark that we've finished communicating */
