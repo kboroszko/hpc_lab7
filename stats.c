@@ -44,16 +44,28 @@ int main(int argc, char * argv[])
 
 //    printf("%d/%d on %d - partner %d on %d\n", myRank, numProcesses, node, partnerRank, partnerNode);fflush(stdout);
 
-    void * buff = malloc(100);
+    int payloads[4];
+    payloads[0] = 1;
+    payloads[1] = 10;
+    payloads[2] = 1024;
+    payloads[3] = 1024*1024;
+
+
+    void * buff = malloc(payloads[3]);
+
     switch (node){
         case 0: {
-            MPI_Recv(buff, 100, MPI_BYTE, partnerRank, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
-            MPI_Send(buff, 100, MPI_BYTE, partnerRank, 0, MPI_COMM_WORLD);
+            for(int i=0; i < 4; i++){
+                MPI_Recv(buff, payloads[i], MPI_BYTE, partnerRank, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+                MPI_Send(buff, payloads[i], MPI_BYTE, partnerRank, 0, MPI_COMM_WORLD);
+            }
             break;
         }
         case 1: {
-            double t = measureLatency(buff, partnerRank, 100);
-            printf("%2d %10d %f", myRank, 100, t);
+            for(int i=0; i<4; i++){
+                double t = measureLatency(buff, partnerRank, payloads[i]);
+                printf("%2d %10d %f\n", myRank, payloads[i], t);
+            }
             break;
         }
     }
