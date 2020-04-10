@@ -31,7 +31,7 @@ int main(int argc, char * argv[])
     int len;
     char * name;
 
-    MPI_Get_processor_name( name, resultlen );
+    MPI_Get_processor_name( name, len );
     
     printf("Hello world from %d/%d on ", myRank, numProcesses);
 
