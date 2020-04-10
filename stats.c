@@ -41,10 +41,8 @@ int main(int argc, char * argv[])
     MPI_Comm_size(MPI_COMM_WORLD, &numProcesses);
     MPI_Comm_rank(MPI_COMM_WORLD, &myRank);
     int node = getNodeId();
-    int partnerNode = (node + 1) % 2;
-    int partnerId = partnerNode * (numProcesses/2);
-
-    printf("%d/%d partner: %d/%d\n", myRank, node, partnerId, partnerNode);
+    int local_rank = OMPI_COMM_WORLD_LOCAL_RANK;
+    printf("%d - %d/%d\n", myRank, local_rank, node);
 
     MPI_Finalize(); /* mark that we've finished communicating */
 
