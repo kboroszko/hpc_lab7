@@ -27,8 +27,18 @@ int main(int argc, char * argv[])
     MPI_Comm_size(MPI_COMM_WORLD, &numProcesses);
 
     MPI_Comm_rank(MPI_COMM_WORLD, &myRank);
+
+    int len;
+    char * name;
+
+    MPI_Get_processor_name( name, resultlen );
     
-    printf("Hello world from %d/%d (slept %u s)!\n", myRank, numProcesses, t);
+    printf("Hello world from %d/%d on ", myRank, numProcesses);
+
+    for(int i=0; i<len; i++){
+        printf("%c", name[i]);
+    }
+    printf("\n");
     
     MPI_Finalize(); /* mark that we've finished communicating */
     
