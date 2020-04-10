@@ -35,16 +35,16 @@ int main(int argc, char * argv[])
 
     double executionTime;
 
-    int * val[100];
+    int * val[10000];
 
     startTime = MPI_Wtime();
 
     switch (myRank){
         case 0:
-            MPI_Send(val, 100, MPI_INT, 1, 0, MPI_COMM_WORLD);
+            MPI_Send(val, 10000, MPI_INT, 1, 0, MPI_COMM_WORLD);
             break;
         case 1:
-            MPI_Recv(val, 100, MPI_INT, 0, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+            MPI_Recv(val, 10000, MPI_INT, 0, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
             break;
     }
     endTime = MPI_Wtime();
