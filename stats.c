@@ -11,23 +11,8 @@
 #include <time.h>
 #include <mpi.h>
 
-int getNodeId(){
-    int numProcesses, myRank;
-
-    MPI_Comm_size(MPI_COMM_WORLD, &numProcesses);
-    MPI_Comm_rank(MPI_COMM_WORLD, &myRank);
-
-
-    char name[MPI_MAX_PROCESSOR_NAME];
-    int len;
-    MPI_Get_processor_name(name, &len);
-    printf("Hello, world.  I am %d of %d on %s\n", myRank, numProcesses, name);fflush(stdout);
-    return ((int) name[len-1]) % 2;
-}
-
-double measureLatency(int to, int payload){
+double measureLatency(void* buff, int to, int payload){
     double startTime,endTime,executionTime;
-    void * buff = (void*) malloc(payload);
 
     startTime = MPI_Wtime();
     MPI_Send(buff, payload, MPI_BYTE, to, 0, MPI_COMM_WORLD);
@@ -47,7 +32,7 @@ int main(int argc, char * argv[])
 
     MPI_Comm_size(MPI_COMM_WORLD, &numProcesses);
     MPI_Comm_rank(MPI_COMM_WORLD, &myRank);
-    int node = getNodeId();
+    int node = myRank/numProcesses;
     int partnerNode, partnerRank;
     if(node == 0){
         partnerNode = 1;
@@ -56,7 +41,16 @@ int main(int argc, char * argv[])
         partnerNode = 0;
         partnerRank = myRank - (numProcesses/2);
     }
-    printf("%2d - %d\n", myRank, node);
+    void * buff = malloc(payload);
+    switch (node){
+        case 0:
+            MPI_Recv(buff, 100, MPI_BYTE, partnerRank, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+            MPI_Send(buff, 100, MPI_BYTE, to, 0, MPI_COMM_WORLD);
+            break;
+        case 1:
+            double t = measureLatency(buff, partnerRank, 100);
+            printf("%2d %10d %f", myRank, 100, t);
+    }
 
     MPI_Finalize(); /* mark that we've finished communicating */
 
