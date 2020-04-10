@@ -64,7 +64,7 @@ int main(int argc, char * argv[])
         case 1: {
             for(int i=0; i<4; i++){
                 double t = measureLatency(buff, partnerRank, payloads[i]);
-                printf("%2d %10d %f\n", myRank, payloads[i], t);
+                printf("%2d %10d %f\n", partnerRank, payloads[i], t);
             }
             break;
         }
