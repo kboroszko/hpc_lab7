@@ -45,13 +45,16 @@ int main(int argc, char * argv[])
 
     void * buff = malloc(100);
     switch (node){
-        case 0:
+        case 0: {
             MPI_Recv(buff, 100, MPI_BYTE, partnerRank, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
             MPI_Send(buff, 100, MPI_BYTE, partnerRank, 0, MPI_COMM_WORLD);
             break;
-        case 1:
+        }
+        case 1: {
             double t = measureLatency(buff, partnerRank, 100);
             printf("%2d %10d %f", myRank, 100, t);
+            break;
+        }
     }
 
     free(buff);
