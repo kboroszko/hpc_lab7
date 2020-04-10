@@ -42,23 +42,23 @@ int main(int argc, char * argv[])
         partnerRank = myRank - (numProcesses/2);
     }
 
-    printf("%d/%d on %d - partner %d on %d\n", myRank, numProcesses, node, partnerRank, partnerNode);fflush(stdout);
+//    printf("%d/%d on %d - partner %d on %d\n", myRank, numProcesses, node, partnerRank, partnerNode);fflush(stdout);
 
-//    void * buff = malloc(100);
-//    switch (node){
-//        case 0: {
-//            MPI_Recv(buff, 100, MPI_BYTE, partnerRank, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
-//            MPI_Send(buff, 100, MPI_BYTE, partnerRank, 0, MPI_COMM_WORLD);
-//            break;
-//        }
-//        case 1: {
-//            double t = measureLatency(buff, partnerRank, 100);
-//            printf("%2d %10d %f", myRank, 100, t);
-//            break;
-//        }
-//    }
-//
-//    free(buff);
+    void * buff = malloc(100);
+    switch (node){
+        case 0: {
+            MPI_Recv(buff, 100, MPI_BYTE, partnerRank, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+            MPI_Send(buff, 100, MPI_BYTE, partnerRank, 0, MPI_COMM_WORLD);
+            break;
+        }
+        case 1: {
+            double t = measureLatency(buff, partnerRank, 100);
+            printf("%2d %10d %f", myRank, 100, t);
+            break;
+        }
+    }
+
+    free(buff);
 
     MPI_Finalize(); /* mark that we've finished communicating */
 
