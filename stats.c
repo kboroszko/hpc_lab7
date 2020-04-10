@@ -11,47 +11,40 @@
 #include <time.h>
 #include <mpi.h>
 
+int getNodeId(){
+    char name[MPI_MAX_PROCESSOR_NAME];
+    int len;
+    MPI_Get_processor_name(name, &len);
+    return ((int) name[len-1]) % 2;
+}
+
+double measureLatency(int to, int payload){
+    double startTime,endTime,executionTime;
+    void * buff = (void*) malloc(payload);
+
+    startTime = MPI_Wtime();
+    MPI_Send(buff, payload, MPI_BYTE, to, 0, MPI_COMM_WORLD);
+    MPI_Recv(buff, payload, MPI_BYTE, to, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+    endTime = MPI_Wtime();
+    return endTime - startTime;
+}
+
+
 int main(int argc, char * argv[])
 {
 
 
     MPI_Init(&argc,&argv); /* intialize the library with parameters caught by the runtime */
 
-    struct timespec spec;
-    clock_gettime(CLOCK_REALTIME, &spec);
-    srand(spec.tv_nsec); // use nsec to have a different value across different processes
-
-    unsigned t = rand() % 5;
-
     int numProcesses, myRank;
 
     MPI_Comm_size(MPI_COMM_WORLD, &numProcesses);
-
     MPI_Comm_rank(MPI_COMM_WORLD, &myRank);
+    int node = getNodeId();
+    int partnerNode = (node + 1) % 2;
+    int partnerId = partnerNode * (numProcesses/2);
 
-    double startTime;
-
-    double endTime;
-
-    double executionTime;
-
-    int * val[10000];
-
-    startTime = MPI_Wtime();
-
-    switch (myRank){
-        case 0:
-            MPI_Send(val, 10000, MPI_INT, 1, 0, MPI_COMM_WORLD);
-            break;
-        case 1:
-            MPI_Recv(val, 10000, MPI_INT, 0, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
-            break;
-    }
-    endTime = MPI_Wtime();
-
-    executionTime = endTime - startTime;
-
-    printf("%d/%d duration: %f\n", myRank, numProcesses, executionTime);
+    printf("%d/%d partner: %d/%d\n", myRank, node, partnerId, partnerNode);
 
     MPI_Finalize(); /* mark that we've finished communicating */
 
